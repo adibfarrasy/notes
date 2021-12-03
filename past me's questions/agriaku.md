@@ -4,7 +4,7 @@
 
 ### DomainServiceModule.kt
 INSTALL THE SERVICE MODULES (authentication, mitra, notification)
-    - how does com.google.inject.AbstractModule work? 
+    - how does com.google.inject.AbstractModule work? TO IMPLEMENT configure() AND CALL THE METHODS WHICH MIRROR THOSE FOUND IN BINDER.
 
 ### authentication/AuthenticationServiceModule
 INJECT THE AUTHENTICATION PORTS WITH THEIR RESPECTIVE BUSINESS LOGIC
@@ -13,10 +13,10 @@ INJECT THE AUTHENTICATION PORTS WITH THEIR RESPECTIVE BUSINESS LOGIC
 
 ### authentication/OTPVerificationServiceImpl
 OTP BUSINESS LOGIC
-    - what is @Inject for and how to use it?
-    - what is companion object and when to use it?
-    - when to use coroutineScope { launch { ... } }?
-    - what is logger and when to use logger?
+    - what is @Inject for and how to use it? INJECT A CONSTRUCTOR. IN JAVA CAN BE USED TO INJECT FIELD AND METHOD AS WELL.
+    - what is companion object and when to use it? FOR OBJECT DECLARATION INSIDE A CLASS. THE OBJECT CAN HAVE FIELDS AND METHODS.
+    - when to use coroutineScope { launch { ... } }? TO WRITE ASYNC NON-BLOCKING CODE (DON'T HAVE TO WAIT FOR THE RESULTS TO BE RECEIVED BEFORE CONTINUING THE PROGRAM)
+    - what is logger and when to use logger? TO LOG API AT DEPLOYMENT
 
 ### authentication/EmailVerificationServiceImpl
 EMAIL VERIFICATION BUSINESS LOGIC
@@ -26,7 +26,7 @@ APPLICATION GETTER/SETTER BUSINESS LOGIC
 
 ### authentication/AuthorizationServiceImpl
 LOGIN/ LOGOUT BUSINESS LOGIC
-    - where the function returns something, where does it go next? (same with all the other business logic)
+    - where the function returns something, where does it go next? (same with all the other business logic) THEY'RE RETURNED INSIDE THE CLASS THAT CALLS ITS INSTANCE, THE SERVICE FUNCTION IS INJECTED INTO THE DOMAIN SERVICE, WHICH IS INJECTED INTO THE MAIN APPLICATION.
 
 ### authentication/UserServiceImpl
 USER CRUD BUSINESS LOGIC
@@ -42,15 +42,21 @@ INJECT NOTIFICATION PORTS WITH THEIR RESPECTIVE BUSINESS LOGIC (ONLY 1)
 
 ### notification/NotificationServiceImpl
 REGISTER/DEACTIVATE TOKEN
-    - how is the registration/ deactivation token related to notification?
+    - how is the registration/ deactivation token related to notification? IT'S A MISNOMER. THE API IS USED TO REGISTER/ DEACTIVATE TOKEN FOR USER DEVICE TO RECEIVE NOTIFICATIONS.
 
 ## Ports Module
 ALL OBJECT DEFINITIONS ARE LOCATED IN PORTS. FUNCTION INPUT-OUTPUT DEFINITIONS ARE PLACED IN INTERFACES, WHILE DATA OBJECT ARE STORED IN DATA CLASS.
 
 ### accessor/authentication/ApplicationAccessor
 INTERFACE WITH ONLY @Throws(Exception::class) AND FUNCTION DEFINITIONS FOR APPLICATION ACCESSOR ADAPTER
-    - what is :: in Exception::class used for?
-    - what is @Throws? what do they do?
+    - what is :: in Exception::class used for? A REFLECTION. IT GETS ACCESS TO THE CLASS, CONSTRUCTORS AND METHODS. TO TURN IT INTO A JAVA REFLECTION, SIMPLY ADD .java i.e. Exception::class.java
+    - what is @Throws? what do they do? DECLARES WHAT EXCEPTION SHOULD BE THROWN WHEN COMPILED TO A JVM METHOD.
+KOTLIN:
+@Throws(IOException::class)
+fun readFile(name: String): String {...}
+
+IS TRANSLATED TO JAVA:
+String readFile(String name) throws IOException {...}
 
 ### accessor/authentication/EmailVerificationAccessor
 INTERFACE WITH ONLY @Throws(Exception::class) AND FUNCTION DEFINITIONS FOR EMAIL VERIFICATION ACCESSOR ADAPTER
@@ -96,7 +102,7 @@ DEFINE THE SHAPE OF GEOLOCATION DATA IN FIRESTORE
 
 ### accessor/firestore/data/TokenFirestoreData
 DEFINE THE SHAPE OF TOKEN DATA IN FIRESTORE
-    - what is platform & token, how are they used?
+    - what is platform & token, how are they used? PLATFORM IS DEVICE TYPE, TOKEN IS FIREBASE TOKEN. NO IMPLEMENTATION IN CODE SO NOT 100% SURE.
 
 ### accessor/firestore/data/UserEmployeeFirestoreData
 DEFINE THE SHAPE OF USER EMPLOYEE DATA IN FIRESTORE
@@ -121,8 +127,8 @@ DEFINE DIFFERENT ERROR CODE NAMES IN ENUM CLASS
 
 ### api/Response
 DEFINE THE RESPONSE DATA (ONLY DATA GENERICS AND ERROR CODE) IN OPEN CLASS
-    - why use open class?
-    - why is the value declared?
+    - why use open class? OPEN CLASS FOR EXTENSION (INHERITANCE)
+    - why is the value declared? SEEMS TO BE FOR DEFAULT VALUE
 
 ### conf/Conf
 SEEMS TO STORE ALL CONFIG, INCLUDING ENVIRONMENT NAMES, DB DETAILS, API_KEYS, ETC
@@ -135,7 +141,7 @@ DEFINE DIFFERENT PLATFORM TYPE (WEB, ANDROID, IOS, IOT) IN ENUM CLASS
 
 ### data/ResourceEnum
 DEFINE RESOURCE IN ENUM CLASS (ONLY GOT 1 ENTRY SO FAR: REGISTER_DEVICE_TOKEN)
-    - what is this used for?
+    - what is this used for? ONLY USED TO DISPLAY A MESSAGE IN REGISTER/ DEACTIVATE TOKEN API ROUTE
 
 ### data/RoleEnum
 DEFINE ROLE IN ENUM CLASS (ONLY GOT 1 ENTRY SO FAR: MITRA)
@@ -158,8 +164,6 @@ CONTAINS AN ENCAPSULATED FUNCTION THAT GENERATES A HASH
 ### utils/CryptoUtils
 CONTAINS ENCAPSULATION FUNCTIONS FOR ENCRYPTION (encrypt, decrypt, validatePassword, etc.)
 
-
-
 ## Adapters Module
 
 ### accessor/AccessorModule
@@ -167,18 +171,18 @@ INSTALL THE ACCESSOR MODULES (AuthenticationAccessorModule, MitraAccessorModule)
 
 ### accessor/AgriakuDatasource
 EMPTY ANNOTATION CLASS AgriakuDatasource
-    - what is annotation class?
-    - what is @BindingAnnotation and how to use it?
-    - what does 'datasource' refer to here?
+    - what is annotation class? KOTLIN SPECIFIC CLASS INTEROPERABLE WITH JAVA ANNOTATION CLASS 
+    - what is @BindingAnnotation and how to use it? AN ANNOTATION CLASS TO BIND A CLASS WITH ITS ANNOTATION
+    - what does 'datasource' refer to here? SEEMS TO BE THE DATABASE SOURCE
 
 ### accessor/AgriakuFirestore
 EMPTY ANNOTATION CLASS AgriakuFirestore
 
 ### accessor/DSLModule
 CONFIG FOR DATABASE
-    - what is HikariConfig and when to use it?
-    - what is HikariDataSource and how to use it?
-    - what is bind(DSLContext::class.java).annotatedWith(AgriakuDatasource::class.java).toInstance(dslContext) and what is it for?
+    - what is HikariConfig and when to use it? A JAVA CONFIG CLASS USED TO INITIALIZE A DATA SOURCE (DATABASE)
+    - what is HikariDataSource and how to use it? AN INSTANCE OF DATA SOURCE CONNECTION WITH THE CONFIGURATION
+    - what is bind(DSLContext::class.java).annotatedWith(AgriakuDatasource::class.java).toInstance(dslContext) and what is it for? SEEMS LIKE TO EXPORT THE dslContext SO THAT IT CAN BE USED OUTSIDE THE FILE, JUST CALL THE INSTANCE NAME WITH THE ANNOTATION
 
 ### accessor/FirestoreModule
 CONFIG FOR FIRESTORE
@@ -227,8 +231,8 @@ FIRESTORE QUERY FOR USER EMPLOYEE FIRESTORE
 
 ### accessor/firestore/UserFranchiseFirestoreAccessorImpl
 FIRESTORE QUERY FOR USER FRANCHISE FIRESTORE
-    - how to use channel?
-    - how to use runBlocking?
+    - how to use channel? CONCEPTUALLY SIMILAR TO BLOCKING QUEUE BUT IT CAN BE CLOSED
+    - how to use runBlocking? SIMILAR TO NODEJS AWAIT, IT RUNS ASYNC FUNCTIONS SYNCHRONOUSLY. NOT SUPPOSED TO BE RUN IN PRODUCTION?
 
 ### accessor/mitra/MitraAccessorModule
 INJECT MITRA ACCESSOR INTERFACE INTO ITS IMPLEMENTATION AND ENFORCE THE SINGLETON
